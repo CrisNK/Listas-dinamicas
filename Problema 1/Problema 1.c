@@ -12,6 +12,7 @@ typedef struct node
 } node;
 
 // Variable global
+node *head = NULL;
 char fileName[30] = "Ningun archivo seleccionado.";
 
 // Funciones Windows/MacOS
@@ -26,7 +27,7 @@ void pause()
 {
     // Support for MacOS.
     ////fflush(stdin);
-    ////getch();
+    ////getchar();
     // Support for Windows.
     system("pause");
 }
@@ -43,7 +44,7 @@ int setOption()
                "|                       Menu Principal                         |\n"
                "*--------------------------------------------------------------*\n"
                "| 1. Leer archivo de texto.                                    |\n"
-               "| 2. Calcular frecuencia de caracteres en un archivo de texto. |\n"
+               "| 2. Generar lista dinamica y mostrar su frecuencia.           |\n"
                "| 3. Ordenar lista por frecuencia (ascendente).                |\n"
                "| 4. Ordenar lista por frecuencia (descendente).               |\n"
                "| 5. Buscar caracter.                                          |\n"
@@ -61,9 +62,25 @@ int setOption()
     } while (option < 1 || option > 6);
     return option;
 }
+void getFrequency()
+{
+    clean();
+    node *aux = head;
+    printf("*-----------------------*\n"
+           "| Caracter | Frecuencia |\n"
+           "*-----------------------*\n");
+    while (aux != NULL)
+    {
+        printf("|    %c     |     %2d     |\n"
+               "*-----------------------*\n",
+               aux->character, aux->frequency);
+        aux = aux->next;
+    }
+    pause();
+}
 
 // Funciones principales
-void readTextFile(node *head)
+void readTextFile()
 {
     FILE *file;
     char character;
@@ -103,13 +120,14 @@ void readTextFile(node *head)
     } while (file == NULL || isFirstCharacterEOF == true);
     head = NULL;
 }
-void createLinkedList(node *head)
+void createLinkedList()
 {
     node *aux;
     if (strcmp(fileName, "Ningun archivo seleccionado.") == 0)
     {
         printf("Error: Se debe leer un archivo antes de ejecutar este comando.\n");
         pause();
+        clean();
         return;
     }
     if (head == NULL)
@@ -159,76 +177,158 @@ void createLinkedList(node *head)
         }
     }
     // Leer los nodos creados:
-    clean();
-    aux = head;
-    printf("*-----------------------*\n"
-           "| Caracter | Frecuencia |\n"
-           "*-----------------------*\n");
-    while (aux != NULL)
-    {
-        printf("|    %c     |     %2d     |\n"
-               "*-----------------------*\n",
-               aux->character, aux->frequency);
-        aux = aux->next;
-    }
-    pause();
+    getFrequency();
 }
-void sortAscending(node *head)
+void sortAscending()
 {
     node *aux, *aux2;
     if (strcmp(fileName, "Ningun archivo seleccionado.") == 0)
     {
         printf("Error: Se debe leer un archivo antes de ejecutar este comando.\n");
         pause();
+        clean();
         return;
     }
-
-    FILE *file;
-    char character;
-
-    // Apertura del archivo en modo sólo lectura.
-    file = fopen(fileName, "r");
-    aux = head;
-    while (aux != NULL)
+    if (head == NULL)
     {
-        aux2 = aux->next;
-        while (aux2 != NULL)
+        printf("Error: Se debe generar la lista dinamica antes de ordenarla.\n");
+        pause();
+        clean();
+    }
+    else
+    {
+        FILE *file;
+        char character;
+        // Apertura del archivo en modo sólo lectura.
+        file = fopen(fileName, "r");
+        aux = head;
+        while (aux != NULL)
         {
-            if (aux->frequency > aux2->frequency)
+            aux2 = aux->next;
+            while (aux2 != NULL)
             {
-                node *temp = (node *)malloc(sizeof(node));
-                temp->character = aux->character;
-                temp->frequency = aux->frequency;
+                if (aux->frequency > aux2->frequency)
+                {
+                    node *temp = (node *)malloc(sizeof(node));
+                    temp->character = aux->character;
+                    temp->frequency = aux->frequency;
 
-                aux->character = aux2->character;
-                aux->frequency = aux2->frequency;
+                    aux->character = aux2->character;
+                    aux->frequency = aux2->frequency;
 
-                aux2->character = temp->character;
-                aux2->frequency = temp->frequency;
+                    aux2->character = temp->character;
+                    aux2->frequency = temp->frequency;
+                }
+                aux2 = aux2->next;
             }
-            aux2 = aux2->next;
+            aux = aux->next;
         }
-        aux = aux->next;
+        // Leer los nodos creados:
+        getFrequency();
     }
-    // Leer los nodos creados:
-    clean();
-    aux = head;
-    printf("*-----------------------*\n"
-           "| Caracter | Frecuencia |\n"
-           "*-----------------------*\n");
-    while (aux != NULL)
+}
+void sortDescending()
+{
+    node *aux, *aux2;
+    if (strcmp(fileName, "Ningun archivo seleccionado.") == 0)
     {
-        printf("|    %c     |     %2d     |\n"
-               "*-----------------------*\n",
-               aux->character, aux->frequency);
-        aux = aux->next;
+        printf("Error: Se debe leer un archivo antes de ejecutar este comando.\n");
+        pause();
+        clean();
+        return;
     }
-    pause();
+    if (head == NULL)
+    {
+        printf("Error: Se debe generar la lista dinamica antes de ordenarla.\n");
+        pause();
+        clean();
+    }
+    else
+    {
+        FILE *file;
+        char character;
+        // Apertura del archivo en modo sólo lectura.
+        file = fopen(fileName, "r");
+        aux = head;
+        while (aux != NULL)
+        {
+            aux2 = aux->next;
+            while (aux2 != NULL)
+            {
+                if (aux->frequency < aux2->frequency)
+                {
+                    node *temp = (node *)malloc(sizeof(node));
+                    temp->character = aux->character;
+                    temp->frequency = aux->frequency;
+
+                    aux->character = aux2->character;
+                    aux->frequency = aux2->frequency;
+
+                    aux2->character = temp->character;
+                    aux2->frequency = temp->frequency;
+                }
+                aux2 = aux2->next;
+            }
+            aux = aux->next;
+        }
+        // Leer los nodos creados:
+        getFrequency();
+    }
+}
+void searchCharacter()
+{
+    if (strcmp(fileName, "Ningun archivo seleccionado.") == 0)
+    {
+        printf("Se debe leer un archivo antes de ejecutar este comando.\n");
+        pause();
+        clean();
+        return;
+    }
+    if (head == NULL)
+    {
+        printf("Error: Se debe generar una lista dinamica antes de buscar un caracter.\n");
+        pause();
+        clean();
+    }
+    else
+    {
+        FILE *file;
+        node *aux = head; // Recorrer la lista y buscar el caracter
+        char characterToSearch;
+        int isFound = false;
+
+        fflush(stdin);
+        printf("Ingrese el caracter a buscar: ");
+        scanf("%c", &characterToSearch);
+
+        while (aux != NULL)
+        {
+            if (characterToSearch == aux->character)
+            {
+                printf("*-----------------------*\n"
+                       "| Caracter | Frecuencia |\n"
+                       "*-----------------------*\n"
+                       "|    %c     |     %2d     |\n"
+                       "*-----------------------*\n",
+                       aux->character, aux->frequency);
+                pause();
+                clean();
+                isFound = true;
+                break;
+            }
+            aux = aux->next;
+        }
+        if (isFound == false)
+        {
+            printf("Error: El caracter ingresado no se encuentra en la lista.\n");
+            pause();
+            clean();
+        }
+    }
 }
 int main()
 {
     int option;
-    node *head = NULL;
     do
     {
         option = setOption();
@@ -236,20 +336,24 @@ int main()
         {
         case 1: // Leer un conjunto de caracteres desde un archivo texto de entrada (.txt).
             clean();
-            readTextFile(head);
+            readTextFile();
             break;
-        case 2:
-            // Generar una lista dinámicamente enlazada L con los caracteres leídos, indicando para cada carácter cuantas veces se encontraba repetido el mismo en el archivo fuente original.
+        case 2: // Generar una lista dinámicamente enlazada L con los caracteres leídos, indicando para cada carácter cuantas veces se encontraba repetido el mismo en el archivo fuente original.
+
             clean();
-            createLinkedList(head);
+            createLinkedList();
             break;
         case 3: // Ordenar la lista por frecuencia creciente.
             clean();
-            sortAscending(head);
+            sortAscending();
             break;
         case 4: //  Ordenar la lista por frecuencia decreciente.
+            clean();
+            sortDescending();
             break;
         case 5: // Buscar la presencia de un carácter específico (a leer) e indicar su frecuencia.
+            clean();
+            searchCharacter();
             break;
         case 6: // Salir.
             break;
