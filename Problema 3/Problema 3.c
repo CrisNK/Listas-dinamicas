@@ -2,7 +2,7 @@
 #include <stdlib.h> // system("cls")
 #include <conio.h> // getch()
 #include <ctype.h> // toupper()
-#define true 1, false 0
+#include <stdbool.h>
 #define retiro 5, deposito 2, consulta 4, actualizacion 5, pagos 6
 #define ENTER 13
 
@@ -114,6 +114,7 @@ int setCase()
 }
 void makeTramits(int *first, int *last)
 {
+    bool isConfirm = false;
     int arrow = 3;
     char key;
     char menuMakeTramits[11][34] = {"*--------------------------------*",
@@ -130,10 +131,9 @@ void makeTramits(int *first, int *last)
     system("cls");
     if (*first == NULL)
     {
+        fflush(stdin);
         printf("Ingrese su nombre: ");
-        fflush(stdin);
         fgets(persons[0].name, 20, stdin);
-        fflush(stdin);
         showMenu(11, 34, menuMakeTramits);
         do
         {
@@ -142,9 +142,10 @@ void makeTramits(int *first, int *last)
                 moveUpMenu(1, 11, 34, menuMakeTramits, &arrow);
             if (key == 'S' && arrow < 9)
                 moveDownMenu(1, 11, 34, menuMakeTramits, &arrow);
-        } while (key != ENTER);
+            if (key == ENTER && arrow == 9)
+                isConfirm = true;
+        } while (isConfirm != true);
     }
-    
 }
 
 int main()
