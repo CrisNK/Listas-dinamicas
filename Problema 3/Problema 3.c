@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h> // system("cls")
-#include <conio.h> // getch()
-#include <ctype.h> // toupper()
+#include <conio.h>  // getch()
+#include <ctype.h>  // toupper()
 #include <stdbool.h>
-#define retiro 5, deposito 2, consulta 4, actualizacion 5, pagos 6
 #define ENTER 13
 
 typedef struct node
@@ -16,11 +15,12 @@ typedef struct person
 {
     char name[20];
     int waitingTime;
-    struct node tramits;
+    struct node *tramits;
 } person;
 
 person persons[10];
 
+// Funciones utilitarias
 void showMenu(int height, int width, char menu[height][width])
 {
     system("cls");
@@ -32,61 +32,102 @@ void showMenu(int height, int width, char menu[height][width])
         printf("\n");
     }
 }
-void moveUpMenu(int codeMenu, int height, int width, char menu[height][width], int *arrow)
+void moveUpMenu(int IDMenu, int height, int width, char menu[height][width], int *arrowPosition)
 {
-    if (codeMenu == 0)
+    if (IDMenu == 0)
     {
-        menu[*arrow][6] = ' ';
-        (*arrow)--;
-        menu[*arrow][6] = '>';
+        menu[*arrowPosition][6] = ' ';
+        (*arrowPosition)--;
+        menu[*arrowPosition][6] = '>';
     }
-    if (codeMenu == 1)
+    if (IDMenu == 1)
     {
-        if (*arrow == 9)
+        if (*arrowPosition == 9)
         {
-            menu[*arrow][8] = ' ';
-            (*arrow)-= 2;
-            menu[*arrow][2] = '>';
+            menu[*arrowPosition][8] = ' ';
+            (*arrowPosition) -= 2;
+            menu[*arrowPosition][2] = '>';
         }
         else
         {
-            menu[*arrow][2] = ' ';
-            (*arrow)--;
-            menu[*arrow][2] = '>';
+            menu[*arrowPosition][2] = ' ';
+            (*arrowPosition)--;
+            menu[*arrowPosition][2] = '>';
         }
     }
     showMenu(height, width, menu);
 }
-void moveDownMenu(int codeMenu, int height, int width, char menu[height][width], int *arrow)
+void moveDownMenu(int IDMenu, int height, int width, char menu[height][width], int *arrowPosition)
 {
-    if (codeMenu == 0)
+    if (IDMenu == 0)
     {
-        menu[*arrow][6] = ' ';
-        (*arrow)++;
-        menu[*arrow][6] = '>';
+        menu[*arrowPosition][6] = ' ';
+        (*arrowPosition)++;
+        menu[*arrowPosition][6] = '>';
     }
-    if (codeMenu == 1)
+    if (IDMenu == 1)
     {
-        if (*arrow == 7)
+        if (*arrowPosition == 7)
         {
-            menu[*arrow][2] = ' ';
-            (*arrow)+= 2;
-            menu[*arrow][8] = '>';
+            menu[*arrowPosition][2] = ' ';
+            (*arrowPosition) += 2;
+            menu[*arrowPosition][8] = '>';
         }
         else
         {
-            menu[*arrow][2] = ' ';
-            (*arrow)++;
-            menu[*arrow][2] = '>';
+            menu[*arrowPosition][2] = ' ';
+            (*arrowPosition)++;
+            menu[*arrowPosition][2] = '>';
         }
     }
     showMenu(height, width, menu);
+}
+//! OPTIMIZAR URGENTEMENTE ESTA FUNCION
+void markX(int arrowPosition, char menu[11][34])
+{
+    int retiro = 3, deposito = 4, consulta = 5, actualizacion = 6, pagos = 7;
+    if (arrowPosition == retiro) // 5 min
+    {
+        if (menu[arrowPosition][25] == 'X')
+            menu[arrowPosition][25] = ' ';
+        else
+            menu[arrowPosition][25] = 'X';
+    }
+    if (arrowPosition == deposito) // 2 min
+    {
+        if (menu[arrowPosition][25] == 'X')
+            menu[arrowPosition][25] = ' ';
+        else
+            menu[arrowPosition][25] = 'X';
+    }
+    if (arrowPosition == consulta) // 4 min
+    {
+        if (menu[arrowPosition][25] == 'X')
+            menu[arrowPosition][25] = ' ';
+        else
+            menu[arrowPosition][25] = 'X';
+    }
+    if (arrowPosition == actualizacion) // 5 min
+    {
+        if (menu[arrowPosition][25] == 'X')
+            menu[arrowPosition][25] = ' ';
+        else
+            menu[arrowPosition][25] = 'X';
+    }
+    if (arrowPosition == pagos) // 6 min
+    {
+        if (menu[arrowPosition][25] == 'X')
+            menu[arrowPosition][25] = ' ';
+        else
+            menu[arrowPosition][25] = 'X';
+    }
+    showMenu(11, 34, menu);
 }
 
 // Funciones principales
 int setCase()
 {
-    int arrow = 3;
+    int arrowPosition = 3;
     char key;
     char menu[7][31] = {"*-----------------------------*",
                         "|        Menu principal       |",
@@ -100,22 +141,23 @@ int setCase()
     {
         key = toupper(getch());
         fflush(stdin);
-        if (key == 'W' && arrow > 3)
-            moveUpMenu(0, 7, 31, menu, &arrow);
-        if (key == 'S' && arrow < 5)
-            moveDownMenu(0, 7, 31, menu, &arrow);
+        if (key == 'W' && arrowPosition > 3)
+            moveUpMenu(0, 7, 31, menu, &arrowPosition);
+        if (key == 'S' && arrowPosition < 5)
+            moveDownMenu(0, 7, 31, menu, &arrowPosition);
     } while (key != ENTER);
-    if (arrow == 3)
+    if (arrowPosition == 3)
         return 1;
-    if (arrow == 4)
+    if (arrowPosition == 4)
         return 2;
-    if (arrow == 5)
+    if (arrowPosition == 5)
         return 3;
 }
 void makeTramits(int *first, int *last)
 {
+    system("cls");
     bool isConfirm = false;
-    int arrow = 3;
+    int arrowPosition = 3, enviar = 9;
     char key;
     char menuMakeTramits[11][34] = {"*--------------------------------*",
                                     "|     Tramite     | Seleccionado |",
@@ -128,24 +170,24 @@ void makeTramits(int *first, int *last)
                                     "*--------------------------------*",
                                     "|         Enviar tramites        |",
                                     "*--------------------------------*"};
-    system("cls");
-    if (*first == NULL)
+    printf("Ingrese su nombre: ");
+    fgets(persons[0].name, 20, stdin);
+    showMenu(11, 34, menuMakeTramits);
+    do
     {
-        fflush(stdin);
-        printf("Ingrese su nombre: ");
-        fgets(persons[0].name, 20, stdin);
-        showMenu(11, 34, menuMakeTramits);
-        do
+        key = toupper(getch());
+        if (key == 'W' && arrowPosition > 3)
+            moveUpMenu(1, 11, 34, menuMakeTramits, &arrowPosition);
+        if (key == 'S' && arrowPosition < 9)
+            moveDownMenu(1, 11, 34, menuMakeTramits, &arrowPosition);
+        if (key == ENTER)
         {
-            key = toupper(getch());
-            if (key == 'W' && arrow > 3)
-                moveUpMenu(1, 11, 34, menuMakeTramits, &arrow);
-            if (key == 'S' && arrow < 9)
-                moveDownMenu(1, 11, 34, menuMakeTramits, &arrow);
-            if (key == ENTER && arrow == 9)
+            markX(arrowPosition, menuMakeTramits);
+            if (arrowPosition == enviar)
                 isConfirm = true;
-        } while (isConfirm != true);
-    }
+        }
+    } while (isConfirm == false);
+
 }
 
 int main()
