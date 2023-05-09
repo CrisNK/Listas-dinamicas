@@ -6,15 +6,13 @@
 
 typedef struct node
 {
-    char name[15];
     int time;
     struct node *next;
 } node;
 typedef struct
 {
     char name[20];
-    int tramit[5];
-    node *pointer;
+    node *tramits;
 } person;
 
 person queue[queueSize];
@@ -41,14 +39,20 @@ int checkIfQueueIsFull(int qRear)
 {
     return (qRear + 1) == queueSize ? true : false;
 }
+int checkIfQueueIsEmpty(int qRear)
+{
+    return qRear == 0 ? true : false;
+}
 void showMessageError(int errorCodeID)
 {
     clean();
     if (errorCodeID == 1)
         printf("Error: La opcion ingresada no es valida.\n");
     if (errorCodeID == 2)
-        printf("Error: La cola está llena.\n");
-    pause();
+        printf("Error: La cola esta llena.\n");
+    if (errorCodeID == 3)
+        printf("Error: La cola esta vacia.\n")
+            pause();
     clean();
 }
 
@@ -95,43 +99,98 @@ int selectTramit()
     } while (option < 1 || option > 6);
     return option;
 }
-void withdraw()
+void makeTramit(node **head, int qRear, int tramitTime)
 {
-
+    if (*head == NULL)
+    {
+        node *new = (node *)malloc(sizeof(node));
+        new->time = tramitTime;
+        new->next = NULL;
+        *head = new;
+    }
+    else
+    {
+        node *aux = *head;
+        while (aux->next != NULL)
+            aux = aux->next;
+        node *new = (node *)malloc(sizeof(node));
+        new->time = tramitTime;
+        new->next = NULL;
+        aux->next = new;
+    }
 }
+int waitingTime(int qRear)
+{
+    int i = 0, suma = 0;
+    node *aux;
+    do
+    {
+        aux = queue[i].tramits;
+        while (aux != NULL)
+        {
+            suma += aux->time;
+            aux = aux->next;
+        }
+        i++;
+    } while (i < qRear);
+    return suma;
+}
+
 int main()
 {
-    int option, qFront = 0, qRear = 0;
+    int option, qFront = 0, qRear = 0, addClient = 1, removeClient = 2;
     do
     {
         option = getMenuOption();
-        switch (option)
+        if (option == addClient)
         {
-        case 1: // Añadir persona a la cola:
             if (checkIfQueueIsFull(qRear) == true)
                 showMessageError(2);
             else
             {
+                node *tramits = NULL;
                 int tramit;
                 printf("Ingrese su nombre: ");
-                scanf("%s", queue[qFront].name);
+                scanf("%s", queue[qRear].name);
                 do
                 {
+                    clean();
                     tramit = selectTramit();
                     switch (tramit)
                     {
-                    case 1: // Retiro = 5 min
-                        withdraw();
-                    case 2: // Deposito = 2 min
-                    case 3: // Consulta = 4 min
+                    case 1: // Retiro        = 5 min
+                        makeTramit(&tramits, qRear, 5);
+                        break;
+                    case 2: // Deposito      = 2 min
+                        makeTramit(&tramits, qRear, 2);
+                        break;
+                    case 3: // Consulta      = 4 min
+                        makeTramit(&tramits, qRear, 4);
+                        break;
                     case 4: // Actualizacion = 5 min
-                    case 5: // Pagos = 6 min
+                        makeTramit(&tramits, qRear, 5);
+                        break;
+                    case 5: // Pagos         = 6 min
+                        makeTramit(&tramits, qRear, 6);
+                        break;
                     case 6: // Finalizar tramites
+                        break;
                     }
                 } while (tramit != 6);
+
+                queue[qRear].tramits = tramits;
+                qRear++;
+
+                clean();
+                if (qRear == 1)
+                    printf("Sus tramites tienen un tiempo estimado de %d minutos.\n", waitingTime(qRear));
+                else
+                    printf("Su tiempo de espera es: %d minutos.\n", waitingTime(qRear));
             }
-        case 2:
-        case 3:
+        }
+        if (option == removeClient)
+        {
+
         }
     } while (option != 3);
     return 0;
