@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> 
 #define true 1
 #define false 0
 #define queueSize 10
@@ -12,6 +13,7 @@ typedef struct node
 typedef struct
 {
     char name[20];
+    int waitingTime;
     node *tramits;
 } person;
 
@@ -51,9 +53,20 @@ void showMessageError(int errorCodeID)
     if (errorCodeID == 2)
         printf("Error: La cola esta llena.\n");
     if (errorCodeID == 3)
-        printf("Error: La cola esta vacia.\n")
-            pause();
+        printf("Error: La cola esta vacia.\n");
+    pause();
     clean();
+}
+int userWaitingTime(node *head)
+{
+    node *aux = head;
+    int time = 0;
+    while (aux != NULL)
+    {
+        time += aux->time;
+        aux = aux->next;
+    }
+    return time;
 }
 
 // Funciones principales:
@@ -66,7 +79,7 @@ int getMenuOption()
                "|      Menu principal      |\n"
                "*--------------------------|\n"
                "| 1. Realizar tramite      |\n"
-               "| 2. Cancelar turno        |\n"
+               "| 2. Abandonar cola        |\n"
                "| 3. Salir                 |\n"
                "*--------------------------*\n"
                " Seleccione una opcion: ");
@@ -99,7 +112,7 @@ int selectTramit()
     } while (option < 1 || option > 6);
     return option;
 }
-void makeTramit(node **head, int qRear, int tramitTime)
+void makeTramit(node **head, int tramitTime)
 {
     if (*head == NULL)
     {
@@ -132,7 +145,7 @@ int waitingTime(int qRear)
             aux = aux->next;
         }
         i++;
-    } while (i < qRear);
+    } while (i < (qRear - 1));
     return suma;
 }
 
@@ -158,20 +171,21 @@ int main()
                     tramit = selectTramit();
                     switch (tramit)
                     {
+                        //! VALIDAR DE QUE AL MENOS SE INGRESE UN TRAMITE
                     case 1: // Retiro        = 5 min
-                        makeTramit(&tramits, qRear, 5);
+                        makeTramit(&tramits, 5);
                         break;
                     case 2: // Deposito      = 2 min
-                        makeTramit(&tramits, qRear, 2);
+                        makeTramit(&tramits, 2);
                         break;
                     case 3: // Consulta      = 4 min
-                        makeTramit(&tramits, qRear, 4);
+                        makeTramit(&tramits, 4);
                         break;
                     case 4: // Actualizacion = 5 min
-                        makeTramit(&tramits, qRear, 5);
+                        makeTramit(&tramits, 5);
                         break;
                     case 5: // Pagos         = 6 min
-                        makeTramit(&tramits, qRear, 6);
+                        makeTramit(&tramits, 6);
                         break;
                     case 6: // Finalizar tramites
                         break;
@@ -179,6 +193,7 @@ int main()
                 } while (tramit != 6);
 
                 queue[qRear].tramits = tramits;
+                queue[qRear].waitingTime = userWaitingTime(tramits);
                 qRear++;
 
                 clean();
@@ -190,7 +205,33 @@ int main()
         }
         if (option == removeClient)
         {
-
+            if (checkIfQueueIsEmpty(qRear) == true)
+                showMessageError(3);
+            else
+            {
+                if (qRear == 1)
+                {
+                    printf("Se acaba de atender al ultimo cliente de la cola.\n");
+                    qRear = 0;
+                }
+                else
+                {
+                    int i, j = 0, auxTime = queue[qFront].waitingTime;
+                    char auxName[20];
+                    strcpy(auxName, queue[qFront].name);
+                    for (i = 0; i < (qRear - 1); i++)
+                    {
+                        j++;
+                        strcpy(queue[i].name, queue[j].name);
+                        queue[i].tramits = queue[j].tramits;
+                    }
+                    qRear--;
+                    printf("Cliente %s ha sido atendido exitosamente.\n"
+                           "Se informa a nuestros usuarios que su tiempo\n"
+                           "de espera se reduce en %d minutos.\n",
+                           auxName, auxTime);
+                }
+            }
         }
     } while (option != 3);
     return 0;
