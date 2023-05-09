@@ -188,6 +188,12 @@ void makeTramits(int *first, int *last)
         }
     } while (isConfirm == false);
 
+    // Ahora que el usuario confirmo las solicitudes, tengo que crear un sistema que verifica las X del menu y sumarlas al tiempo de espera del usuario.
+    if (first == NULL)
+    {
+        node *new = (node *)malloc(sizeof(node));
+
+    }
 }
 
 int main()
