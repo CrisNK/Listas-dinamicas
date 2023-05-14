@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> 
+#include <string.h>
 #define true 1
 #define false 0
 #define queueSize 10
@@ -45,7 +45,7 @@ int checkIfQueueIsEmpty(int qRear)
 {
     return qRear == 0 ? true : false;
 }
-void showMessageError(int errorCodeID)
+void displayMessageError(int errorCodeID)
 {
     clean();
     if (errorCodeID == 1)
@@ -54,6 +54,8 @@ void showMessageError(int errorCodeID)
         printf("Error: La cola esta llena.\n");
     if (errorCodeID == 3)
         printf("Error: La cola esta vacia.\n");
+    if (errorCodeID == 4)
+        printf("Error: No se ha seleccionado ningun tramite.\n");
     pause();
     clean();
 }
@@ -85,7 +87,7 @@ int getMenuOption()
                " Seleccione una opcion: ");
         scanf("%d", &option);
         if (option < 1 || option > 3)
-            showMessageError(1);
+            displayMessageError(1);
     } while (option < 1 || option > 3);
     clean();
     return option;
@@ -108,7 +110,7 @@ int selectTramit()
                " Seleccione una opcion: ");
         scanf("%d", &option);
         if (option < 1 || option > 6)
-            showMessageError(1);
+            displayMessageError(1);
     } while (option < 1 || option > 6);
     return option;
 }
@@ -158,11 +160,11 @@ int main()
         if (option == addClient)
         {
             if (checkIfQueueIsFull(qRear) == true)
-                showMessageError(2);
+                displayMessageError(2);
             else
             {
                 node *tramits = NULL;
-                int tramit;
+                int tramit, customerPerformedTramit = false;
                 printf("Ingrese su nombre: ");
                 scanf("%s", queue[qRear].name);
                 do
@@ -171,26 +173,32 @@ int main()
                     tramit = selectTramit();
                     switch (tramit)
                     {
-                        //! VALIDAR DE QUE AL MENOS SE INGRESE UN TRAMITE
                     case 1: // Retiro        = 5 min
                         makeTramit(&tramits, 5);
+                        customerPerformedTramit = true;
                         break;
                     case 2: // Deposito      = 2 min
                         makeTramit(&tramits, 2);
+                        customerPerformedTramit = true;
                         break;
                     case 3: // Consulta      = 4 min
                         makeTramit(&tramits, 4);
+                        customerPerformedTramit = true;
                         break;
                     case 4: // Actualizacion = 5 min
                         makeTramit(&tramits, 5);
+                        customerPerformedTramit = true;
                         break;
                     case 5: // Pagos         = 6 min
                         makeTramit(&tramits, 6);
+                        customerPerformedTramit = true;
                         break;
                     case 6: // Finalizar tramites
+                        if (customerPerformedTramit == false)
+                            displayMessageError(4);
                         break;
                     }
-                } while (tramit != 6);
+                } while (tramit != 6 || customerPerformedTramit == false);
 
                 queue[qRear].tramits = tramits;
                 queue[qRear].waitingTime = userWaitingTime(tramits);
@@ -200,13 +208,13 @@ int main()
                 if (qRear == 1)
                     printf("Sus tramites tienen un tiempo estimado de %d minutos.\n", waitingTime(qRear));
                 else
-                    printf("Su tiempo de espera es: %d minutos.\n", waitingTime(qRear));
+                    printf("Su tiempo de espera es de: %d minutos.\n", waitingTime(qRear));
             }
         }
         if (option == removeClient)
         {
             if (checkIfQueueIsEmpty(qRear) == true)
-                showMessageError(3);
+                displayMessageError(3);
             else
             {
                 if (qRear == 1)
