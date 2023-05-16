@@ -143,35 +143,37 @@ void createLinkedList()
         {
             isFound = false;
             character = fgetc(file);
-
-            node *new = (node *)malloc(sizeof(node));
-            new->character = character;
-            new->frequency = 1;
-            new->next = NULL;
-
-            aux = head;
-            // Cuando la lista está vacía:
-            if (aux == NULL)
-                head = new;
-            else
+            if (character != EOF)
             {
-                // Cuando el caracter ya se encuentra en la lista:
-                while (aux != NULL)
+                node *new = (node *)malloc(sizeof(node));
+                new->character = character;
+                new->frequency = 1;
+                new->next = NULL;
+
+                aux = head;
+                // Cuando la lista está vacía:
+                if (aux == NULL)
+                    head = new;
+                else
                 {
-                    if (aux->character == character)
+                    // Cuando el caracter ya se encuentra en la lista:
+                    while (aux != NULL)
                     {
-                        aux->frequency++;
-                        isFound = true;
-                    }
-                    aux = aux->next;
-                }
-                // Cuando el caracter no se encuentra en la lista:
-                if (isFound == false)
-                {
-                    aux = head;
-                    while (aux->next != NULL)
+                        if (aux->character == character)
+                        {
+                            aux->frequency++;
+                            isFound = true;
+                        }
                         aux = aux->next;
-                    aux->next = new;
+                    }
+                    // Cuando el caracter no se encuentra en la lista:
+                    if (isFound == false)
+                    {
+                        aux = head;
+                        while (aux->next != NULL)
+                            aux = aux->next;
+                        aux->next = new;
+                    }
                 }
             }
         }
@@ -339,7 +341,6 @@ int main()
             readTextFile();
             break;
         case 2: // Generar una lista dinámicamente enlazada L con los caracteres leídos, indicando para cada carácter cuantas veces se encontraba repetido el mismo en el archivo fuente original.
-
             clean();
             createLinkedList();
             break;
