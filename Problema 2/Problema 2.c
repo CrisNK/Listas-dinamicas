@@ -7,6 +7,17 @@
 #define true 1
 #define false 0
 
+typedef struct
+{
+    int id;
+    char empresa[100];
+} CONTAINER;
+typedef struct
+{
+    CONTAINER container[MAX_containers];
+    int tope;
+} PILA;
+
 void clean()
 {
     system("clear");
@@ -18,38 +29,19 @@ void pause()
     getchar();
     ////system("pause");
 }
-
-// Estrucutra que guarda los valores que tengo en cada container
-typedef struct nodo
-{
-    int id;
-    char empresa[100];
-} CONTAINER;
-
-// Estructura que almacena cuantos containers maximo puedo guardar en cada pila
-typedef struct pila
-{
-    CONTAINER nodos[MAX_containers];
-    int tope;
-} PILA;
-
 // Protipos de funciones
-void agregar_nodo(PILA pila[]);
-void eliminar_container(PILA pila[]);
-void imprimir_infoPilas(PILA pila[]);
-void mostrar_matriz(PILA pila[]);
+void agregarContainer(PILA pila[]);
+void eliminarContainer(PILA pila[]);
+void mostrarListado(PILA pila[]);
 void menu();
 
 int main()
 {
     srand(time(NULL));
     PILA pila[MAX_pilas];
-    for (int i = 0; i < MAX_pilas; i++)
-    {
-        pila[i].tope = -1; // inicializar el ejerccio full vacio
-    }
-
-    int opcion;
+    int i, opcion;
+    for (i = 0; i < MAX_pilas; i++)
+        pila[i].tope = -1;
     do
     {
         menu();
@@ -57,23 +49,17 @@ int main()
         switch (opcion)
         {
         case 1:
-            // Agregar containers
             clean();
-            agregar_nodo(pila);
-            imprimir_infoPilas(pila);
-            fflush(stdin);
-            getchar();
+            agregarContainer(pila);
             break;
         case 2:
-            // Eliminar continers
-            eliminar_container(pila);
+            eliminarContainer(pila);
             break;
         case 3:
             // PEEK de la pila que el usuario escoja
             break;
         case 4:
-            // Imprimir pilas de containers
-            mostrar_matriz(pila);
+            mostrarListado(pila);
             pause();
             break;
         case 5:
@@ -87,10 +73,10 @@ int main()
     return 0;
 }
 
-void agregar_nodo(PILA pila[])
+void agregarContainer(PILA pila[])
 {
     // Comprobar de que las pilas estén libres para ingresar un nuevo container.
-    mostrar_matriz(pila);
+    mostrarListado(pila);
     int i, isFull[MAX_pilas];
     for (i = 0; i < MAX_pilas; i++)
     {
@@ -119,11 +105,11 @@ void agregar_nodo(PILA pila[])
     printf("Ingresa el nombre de la empresa propietaria del container: ");
     scanf("%s", empresa);
     pila[posicionPila].tope++;
-    pila[posicionPila].nodos[pila[posicionPila].tope].id = 1000 + rand() % 8999;
-    strcpy(pila[posicionPila].nodos[pila[posicionPila].tope].empresa, empresa);
+    pila[posicionPila].container[pila[posicionPila].tope].id = 1000 + rand() % 8999;
+    strcpy(pila[posicionPila].container[pila[posicionPila].tope].empresa, empresa);
 }
 
-void eliminar_container(PILA pila[])
+void eliminarContainer(PILA pila[])
 {
     int id, i, isFounded = false;
     int bandera = 0;
@@ -143,7 +129,7 @@ void eliminar_container(PILA pila[])
         while (posicionActualContainer < pila[i].tope)
         {
             // Aqui encuentro la posicion del elemento que quiero eliminar.
-            if (pila[i].nodos[posicionActualContainer + 1].id == id)
+            if (pila[i].container[posicionActualContainer + 1].id == id)
             {
                 bandera = 1;
                 // Aqui consulto si es que la posicion que quiero borrar esta en el tope.
@@ -161,8 +147,8 @@ void eliminar_container(PILA pila[])
                     // Se pasan los containers que estan encima del que se quiere eliminar a la pila auxiliar.
                     while (topeDelContainer > posicionActualContainer + 1)
                     {
-                        containerAux[topeAux].id = pila[i].nodos[topeDelContainer].id;
-                        strcpy(containerAux[topeAux].empresa, pila[i].nodos[topeDelContainer].empresa);
+                        containerAux[topeAux].id = pila[i].container[topeDelContainer].id;
+                        strcpy(containerAux[topeAux].empresa, pila[i].container[topeDelContainer].empresa);
                         topeAux++;
                         topeDelContainer--;
                         if (topeDelContainer == posicionActualContainer + 1)
@@ -172,8 +158,8 @@ void eliminar_container(PILA pila[])
                             int j;
                             for (j = topeAux; j > 0; j--)
                             {
-                                pila[i].nodos[topeDelContainer].id = containerAux[j - 1].id;
-                                strcpy(pila[i].nodos[topeDelContainer].empresa, containerAux[j - 1].empresa);
+                                pila[i].container[topeDelContainer].id = containerAux[j - 1].id;
+                                strcpy(pila[i].container[topeDelContainer].empresa, containerAux[j - 1].empresa);
                                 topeDelContainer++;
                             }
                             pila[i].tope = topeDelContainer - 1;
@@ -200,24 +186,7 @@ void eliminar_container(PILA pila[])
         pause();
     }
 }
-
-void imprimir_infoPilas(PILA pila[])
-{
-    int i, contador = -1;
-    for (i = 0; i < MAX_pilas; i++)
-    {
-        printf("\n\nPila %d de containers:\n", i + 1);
-        // 0
-        while (pila[i].tope != contador)
-        {
-            printf("ID: %d\nEmpresa: %s\n", pila[i].nodos[contador + 1].id, pila[i].nodos[contador + 1].empresa);
-            contador++;
-        }
-        contador = -1;
-    }
-}
-
-void mostrar_matriz(PILA pila[])
+void mostrarListado(PILA pila[])
 {
     int matriz[14][13];
     int cantidadContainers = -1;
@@ -240,7 +209,7 @@ void mostrar_matriz(PILA pila[])
                 while (pila[0].tope != cantidadContainers)
                 {
                     cantidadContainers++;
-                    matriz[k][j] = pila[0].nodos[cantidadContainers].id;
+                    matriz[k][j] = pila[0].container[cantidadContainers].id;
                     k--;
                 }
             }
@@ -250,7 +219,7 @@ void mostrar_matriz(PILA pila[])
                 while (pila[1].tope != cantidadContainers)
                 {
                     cantidadContainers++;
-                    matriz[k][j] = pila[1].nodos[cantidadContainers].id;
+                    matriz[k][j] = pila[1].container[cantidadContainers].id;
                     k--;
                 }
             }
@@ -260,7 +229,7 @@ void mostrar_matriz(PILA pila[])
                 while (pila[2].tope != cantidadContainers)
                 {
                     cantidadContainers++;
-                    matriz[k][j] = pila[2].nodos[cantidadContainers].id;
+                    matriz[k][j] = pila[2].container[cantidadContainers].id;
                     k--;
                 }
             }
@@ -270,7 +239,7 @@ void mostrar_matriz(PILA pila[])
                 while (pila[3].tope != cantidadContainers)
                 {
                     cantidadContainers++;
-                    matriz[k][j] = pila[3].nodos[cantidadContainers].id;
+                    matriz[k][j] = pila[3].container[cantidadContainers].id;
                     k--;
                 }
             }
@@ -280,7 +249,7 @@ void mostrar_matriz(PILA pila[])
                 while (pila[4].tope != cantidadContainers)
                 {
                     cantidadContainers++;
-                    matriz[k][j] = pila[4].nodos[cantidadContainers].id;
+                    matriz[k][j] = pila[4].container[cantidadContainers].id;
                     k--;
                 }
             }
@@ -290,7 +259,7 @@ void mostrar_matriz(PILA pila[])
                 while (pila[5].tope != cantidadContainers)
                 {
                     cantidadContainers++;
-                    matriz[k][j] = pila[5].nodos[cantidadContainers].id;
+                    matriz[k][j] = pila[5].container[cantidadContainers].id;
                     k--;
                 }
             }
@@ -300,7 +269,7 @@ void mostrar_matriz(PILA pila[])
                 while (pila[6].tope != cantidadContainers)
                 {
                     cantidadContainers++;
-                    matriz[k][j] = pila[6].nodos[cantidadContainers].id;
+                    matriz[k][j] = pila[6].container[cantidadContainers].id;
                     k--;
                 }
             }
