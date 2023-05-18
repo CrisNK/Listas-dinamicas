@@ -32,7 +32,8 @@ void pause()
 // Protipos de funciones
 void agregarContainer(PILA pila[]);
 void eliminarContainer(PILA pila[]);
-void mostrarListado(PILA pila[]);
+void mostrarContainers(PILA pila[]);
+void imprimir_infoPilas(PILA pila[]);
 void menu();
 
 int main()
@@ -51,6 +52,7 @@ int main()
         case 1:
             clean();
             agregarContainer(pila);
+            imprimir_infoPilas(pila);
             break;
         case 2:
             eliminarContainer(pila);
@@ -59,7 +61,7 @@ int main()
             // PEEK de la pila que el usuario escoja
             break;
         case 4:
-            mostrarListado(pila);
+            mostrarContainers(pila);
             pause();
             break;
         case 5:
@@ -90,7 +92,7 @@ void agregarContainer(PILA pila[])
 
     int posicionPila;
     char empresa[100];
-    mostrarListado(pila);
+    mostrarContainers(pila);
     do
     {
         printf("A que pila deseas ingresarle un container? ");
@@ -186,7 +188,7 @@ void eliminarContainer(PILA pila[])
         pause();
     }
 }
-void mostrarListado(PILA pila[])
+void mostrarContainers(PILA pila[])
 {
     int matriz[14][13];
     int cantidadContainers = -1;
@@ -291,6 +293,21 @@ void mostrarListado(PILA pila[])
             }
         }
         printf("\n");
+    }
+}
+void imprimir_infoPilas(PILA pila[])
+{
+    int i, contador = -1;
+    for (i = 0; i < MAX_pilas; i++)
+    {
+        printf("\n\nPila %d de containers:\n", i + 1);
+        // 0
+        while (pila[i].tope != contador)
+        {
+            printf("ID: %d\nEmpresa: %s\n", pila[i].nodos[contador + 1].id, pila[i].nodos[contador + 1].empresa);
+            contador++;
+        }
+        contador = -1;
     }
 }
 void menu()
