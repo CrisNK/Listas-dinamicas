@@ -76,39 +76,39 @@ int main()
 void agregarContainer(PILA pila[])
 {
     // Comprobar de que las pilas estén libres para ingresar un nuevo container.
-    mostrarListado(pila);
-    int i, isFull[MAX_pilas];
+    int i, pilasLlenas = 0;
     for (i = 0; i < MAX_pilas; i++)
     {
         if (pila[i].tope == (MAX_containers - 1))
-            isFull[i] = true;
-        else
-            isFull[i] = false;
+            pilasLlenas++;
+    }
+    if (pilasLlenas == MAX_pilas)
+    {
+        printf("Error: No hay espacio para ingresar otro container.\n");
+        return;
     }
 
-    // Agrega el container.
     int posicionPila;
     char empresa[100];
-    printf("A que pila deseas ingresarle un container? ");
-    scanf("%d", &posicionPila);
-    posicionPila--;
-
-    if (pila[posicionPila].tope == 6) //? El 6 deberia ser 'MAX_containers'
+    mostrarListado(pila);
+    do
     {
-        while (pila[posicionPila].tope == 6)
+        printf("A que pila deseas ingresarle un container? ");
+        scanf("%d", &posicionPila);
+        if (pila[posicionPila].tope == MAX_containers)
         {
-            printf("Pila de containers llena, ingrese otra posicion: ");
-            scanf("%d", &posicionPila);
-            posicionPila--;
+            clean();
+            printf("Error: Pila de containers llena.\n");
         }
-    }
+    } while (posicionPila < 1 || posicionPila > 8);
+
+    posicionPila--;
     printf("Ingresa el nombre de la empresa propietaria del container: ");
     scanf("%s", empresa);
     pila[posicionPila].tope++;
     pila[posicionPila].container[pila[posicionPila].tope].id = 1000 + rand() % 8999;
     strcpy(pila[posicionPila].container[pila[posicionPila].tope].empresa, empresa);
 }
-
 void eliminarContainer(PILA pila[])
 {
     int id, i, isFounded = false;
@@ -293,7 +293,6 @@ void mostrarListado(PILA pila[])
         printf("\n");
     }
 }
-
 void menu()
 {
     clean();
